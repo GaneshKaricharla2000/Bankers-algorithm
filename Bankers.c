@@ -15,8 +15,60 @@ pthread_mutex_t lockResources;
 pthread_cond_t condition;
 
 
-int safeseqlist();
-void ProcessCode();
+int safeseqlist()
+{
+  int canallocate;
+  int temp[nofresourses];
+  for(i=0;i<nofresourses;i++)
+  {
+    temp[i]=resource[i];
+  }
+  int completed[nofprocesses];
+  for(i=0;i<nofprocesses;i++)
+  {
+    completed[i]=0;
+  }
+  int nofcompleted=0;
+  while(nofcompleted < nofprocesses)
+  {
+    int safe=0;
+    for(i=0;i<nofprocesses;i++)
+    {
+      if(completed[i]==0)
+      {
+        canallocate =1;
+      for(j=0;j<nofresourses;j++)
+      {
+        if(need[i][j] >temp[j])
+        {
+          canallocate =0;
+          break;
+        }
+      }
+      if(canallocate==1)
+      {
+        for(j=0;j<nofresourses;j++)
+        {
+          temp[j] =temp[j]+allocated[i][j];
+        }
+          safeseq[nofcompleted]=i;
+          completed[i]=1;
+          nofcompleted++;
+          safe=1;
+      }
+      }
+    }
+    if(safe ==0)
+    {
+      for(int k=0;k<nofprocesses;k++)
+      {
+        safeseq[k] =-1;
+      }
+      return (0);
+    }
+  }
+  return (1);
+}
 
 int main()
 {
@@ -42,10 +94,10 @@ int main()
   {
       allocated[i]=(int *)malloc(nofresourses*sizeof(**allocated));
   }
-   need = (int **)malloc(nProcesses * sizeof(*need));
-  for(int i=0; i<nProcesses; i++)
+   need = (int **)malloc(nofprocesses * sizeof(*need));
+  for(int i=0; i<nofprocesses; i++)
   {
-      need[i] = (int *)malloc(nResources * sizeof(**need));
+      need[i] = (int *)malloc(nofresourses* sizeof(**need));
   }
   
  }
@@ -61,7 +113,7 @@ int main()
   
   for(i=0;i<nofprocesses;i++)
   {
-    printf("For process %d",i+1);
+    printf("For process %d\n",i+1);
     for(j=0;j<nofresourses;j++)
     {
       printf("\tEnter the Total resources required in %d -->",j+1);
@@ -85,7 +137,7 @@ int main()
 
   for(i=0;i<nofprocesses;i++)
   {
-    for(j=0;j<nofresourses;i++)
+    for(j=0;j<nofresourses;j++)
     {
       need[i][j]=required[i][j]-allocated[i][j] ;
     }
@@ -97,15 +149,21 @@ int main()
   
  }
   
+
   
   {//CHECK SAFE SEQUENCE
-    if(safeseqlist() == 0)
-    {
-      printf("\n UNSAFE State--> No allocation can be done ");
-      exit(0);
-    }
-    printf("Safe sequence Found");
-    
+      if(safeseqlist() == 0)
+      {
+        printf("\n UNSAFE State--> No allocation can be done ");
+        exit(0);
+      }
+      system("cls");
+      printf("Safe sequence Found\n");
+      for(i=0;i<nofprocesses;i++)
+      {
+          printf("\t %d \t",safeseq[i]+1);
+      }
   }
   
 }
+
