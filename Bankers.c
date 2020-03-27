@@ -235,7 +235,7 @@ int main()
       {
         pthread_join(processes[i],NULL);
       }
-      printf("/n/n/nFinished");
+      printf("\n\n\nFinished");
       release();
   }
 }
