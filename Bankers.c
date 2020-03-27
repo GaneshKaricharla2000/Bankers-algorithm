@@ -212,7 +212,8 @@ int main()
       printf("Safe sequence Found\n");
       for(i=0;i<nofprocesses;i++)
       {
-          printf("%d  ",safeseq[i]);
+          int t=safeseq[i];
+          printf("%d  ",t+1);
       }
       printf("Safe sequence Aquired");
   }
